@@ -37,30 +37,7 @@ def make_fruit():
     fruit = (x, y)
 
 
-make_fruit()
-
-while True:
-    game_t += 1
-    head = snake[-1]
-
-    # only want cardinal movement, no diagnols, so this is the cheaty way to do it
-    if get_key("a") or get_key("d"):
-        dir_y = 0
-        dir_x = get_key("d") - get_key("a")
-    elif get_key("w") or get_key("s"):
-        dir_x = 0
-        dir_y = get_key("s") - get_key("w")
-
-    if game_t % game_speed == 0:
-        new_head = head[0] + dir_x, head[1] + dir_y
-        snake.append(new_head)
-
-        if (new_head[0] == fruit[0] and new_head[1] == fruit[1]) or get_key("space"):
-            make_fruit()
-        else:
-            snake = snake[1:]
-
-    # draw background
+def draw_background():
     draw_offset = G_SIZE * 2
 
     for x in range(W):
@@ -77,17 +54,9 @@ while True:
             if ((x) % draw_offset == 0) and ((y) % draw_offset == 0):
                 draw_pixel(x, y, my_grey)
 
-    # draw snake 2
-    # snake pos and then direction for line drawing
-    # snake_segments = [
-    #    (i, x1, y1, (x1 - x2), (y1 - y2))
-    #    for i, ((x1, y1), (x2, y2)) in enumerate(
-    #        zip([snake[0]] + snake[:-2], snake[:-1])
-    #    )
-    # ]
 
+def draw_snake(snake):
     # draw snake
-
     for layer in range(2):
         for i, ((x, y), (prev_x, prev_y)) in enumerate(
             zip([snake[0]] + snake[:-1], snake)
@@ -106,11 +75,49 @@ while True:
                         color_hsv((i - j * x_off - k * y_off), 170, 100 + layer * 100),
                     )
 
+
+def update_game():
+    global snake, dir_x, dir_y
+    head = snake[-1]
+
+    # only want cardinal movement, no diagnols, so this is the cheaty way to do it
+    if get_key("a") or get_key("d"):
+        dir_y = 0
+        dir_x = get_key("d") - get_key("a")
+    elif get_key("w") or get_key("s"):
+        dir_x = 0
+        dir_y = get_key("s") - get_key("w")
+
+    # update the snake pos and fruit every nth game tick
+    if game_t % game_speed == 0:
+        new_head = head[0] + dir_x, head[1] + dir_y
+        snake.append(new_head)
+
+        if (new_head[0] == fruit[0] and new_head[1] == fruit[1]) or get_key("space"):
+            make_fruit()
+        else:
+            snake = snake[1:]
+
+
+def draw_fruit():
+    # draw fruit
     draw_pixel(
         fruit[0] * G_SIZE,
         fruit[1] * G_SIZE,
         color_hsv(150, 100, 200 + sin(game_t / 10) * 55),
     )
 
-    draw()
-    refresh()
+
+make_fruit()
+
+if __name__ == "__main__":
+    while True:
+        game_t += 1
+
+        update_game()
+        draw_background()
+        draw_snake(snake)
+        draw_fruit()
+
+        draw()
+        refresh()
