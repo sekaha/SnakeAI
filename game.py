@@ -9,19 +9,11 @@ W, H = get_width_adjusted(), get_height_adjusted()
 
 G_SIZE = 2
 
-snake_grid = [
-    [randint(0, 3) for row in range(H // G_SIZE)] for column in range(W // G_SIZE + 1)
-]
-
-DIR = {"up": 0, "left": 1, "down": 2, "right": 3}
-
 game_t = 0
 game_speed = 3
 snake = [(0, 0)]
 dir_x, dir_y = 1, 0
 fruit = None
-
-snake_dir = DIR["right"]
 
 
 def make_fruit():
